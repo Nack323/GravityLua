@@ -39,15 +39,19 @@ end
 
 function Table_printer(table)
     --- prints a table in a non offensive manner.
-    print("[")
+    -- print("[")
+    -- for _, el in ipairs(table) do
+    --     if _ ~= (#table) then
+    --         print(" " .. el .. ",")
+    --     else
+    --         print(" " .. el .. "")
+    --     end
+    -- end
+    -- print("]")
     for _, el in ipairs(table) do
-        if _ ~= (#table) then
-            print(" " .. el .. ",")
-        else
-            print(" " .. el .. "")
-        end
+        io.write(tostring(el) .. ' ')
     end
-    print("]")
+    io.write('\n')
 end
 
 
@@ -61,18 +65,23 @@ end
 -- position = pos + vel * dt
 -- vel = vel + grav * dt
 --
-X = {6.378e6, 0, 0};
-V = {6.378e5, 0, 0};
+X = {0, 0, 6.37e6};
+V = {0, -10e3, 0};
+-- position and mass of the mass point
 MASS_POINT = {0, 0, 0};
-MASS_POINT_MASS = 5.972e24;
+MASS_POINT_MASS = 5.97e24;
+-- a constant to keep things accurate
 GRAV_CONSTANT = 6.67430e-11;
 Tprint = Table_printer
+T = 0; --time
+Dt = 0.1;
 
 function GravityField(v)
-    --takes a vector and returns the acceleration field.
-    -- for now I will just use a mass point at 0, 0, 0
+    --takes a vector and returns the acceleration field. for now I will just
+    --use a mass point at 0, 0, 0 this will only work with a single point.
+    --Later I can do it with multiple ones.
     local vn = Vector_negative(MASS_POINT);
-    local distancev = Vector_addition(v, vn);
+    local distancev = Vector_addition(v,vn);
     local distancen = Vector_norm(distancev);
     local scalar = - GRAV_CONSTANT * MASS_POINT_MASS
     scalar = scalar / (distancen ^ 3)
@@ -80,3 +89,21 @@ function GravityField(v)
     return gf
 end
 
+--Start the simulation
+--
+Limit = 300000
+DEBUG = false;
+
+while T < Limit do
+    T = T + Dt;
+    local gf = GravityField(X);
+    Tprint(X)
+    if DEBUG then
+        Tprint(V)
+        Tprint(gf)
+        print(' ')
+    end
+    X = Vector_addition(X, Vector_scalar_multiplication(Dt, V))--X + V * Dt;
+    V = Vector_addition(V, Vector_scalar_multiplication(Dt, gf))--V + gf * Dt;
+end
+--
