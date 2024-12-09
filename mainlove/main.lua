@@ -1,5 +1,6 @@
 -- we pretty much only need an addition function and a scalar multiplication
 -- function for this to work. 
+local love = require("love")
 --
 function Vector_addition(v1, v2)
     --- Adds vectors with each other.
@@ -66,7 +67,8 @@ end
 -- vel = vel + grav * dt
 --
 X = {0, 0, 6.37e6};
-V = {0, -10e3, 0};
+Xdisplay = Vector_scalar_multiplication(1e-11, X)
+V = {0, -10000, 0};
 -- position and mass of the mass point
 MASS_POINT = {0, 0, 0};
 MASS_POINT_MASS = 5.97e24;
@@ -74,7 +76,8 @@ MASS_POINT_MASS = 5.97e24;
 GRAV_CONSTANT = 6.67430e-11;
 Tprint = Table_printer
 T = 0; --time
-Dt = 3600;
+Dt = 1;
+SCALE = 1;
 
 function GravityField(v)
     --takes a vector and returns the acceleration field. for now I will just
@@ -93,17 +96,41 @@ end
 --
 Limit = 3600 * 24 * 28
 DEBUG = false;
+DISPLAY = 0;
+UPDATES_PER_DISPLAY = 10;
 
-while T < Limit do
-    T = T + Dt;
-    local gf = GravityField(X);
-    Tprint(X)
-    if DEBUG then
-        Tprint(V)
-        Tprint(gf)
-        print(' ')
+-- while T < Limit do
+--     T = T + Dt;
+--     local gf = GravityField(X);
+--     Tprint(X)
+--     if DEBUG then
+--         Tprint(V)
+--         Tprint(gf)
+--         print(' ')
+--     end
+--     X = Vector_addition(X, Vector_scalar_multiplication(Dt, V))--X + V * Dt;
+--     V = Vector_addition(V, Vector_scalar_multiplication(Dt, gf))--V + gf * Dt;
+-- end
+
+function love.update()
+    for _ = 1, 10 do
+        T = T + Dt;
+        local gf = GravityField(X);
+        -- Tprint(X)
+        if DEBUG then
+            Tprint(V)
+            Tprint(gf)
+            print(' ')
+        end
+        X = Vector_addition(X, Vector_scalar_multiplication(Dt, V))--X + V * Dt;
+        Xdisplay = Vector_scalar_multiplication(1e-5, X)
+        V = Vector_addition(V, Vector_scalar_multiplication(Dt, gf))--V + gf * Dt;
     end
-    X = Vector_addition(X, Vector_scalar_multiplication(Dt, V))--X + V * Dt;
-    V = Vector_addition(V, Vector_scalar_multiplication(Dt, gf))--V + gf * Dt;
 end
---
+
+function love.draw()
+    love.graphics.ellipse("line", 300, 300, 15)
+    -- love.timer.sleep(1)
+    love.graphics.ellipse("line",  SCALE * Xdisplay[2] + 300, SCALE * Xdisplay[3] + 300, 2)
+    love.graphics.print("T: ".. T, 10, 10)
+end
