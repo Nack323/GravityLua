@@ -66,18 +66,18 @@ end
 -- position = pos + vel * dt
 -- vel = vel + grav * dt
 --
-X = {0, 0, 6.37e6};
+X = {0, 0, 6378e3 + 408e3};
 Xdisplay = Vector_scalar_multiplication(1e-11, X)
-V = {0, -10000, 0};
+V = {0, -7660, 0};
 -- position and mass of the mass point
 MASS_POINT = {0, 0, 0};
 MASS_POINT_MASS = 5.97e24;
+EARTH_DIAMETER = 6378e3;
 -- a constant to keep things accurate
 GRAV_CONSTANT = 6.67430e-11;
 Tprint = Table_printer
 T = 0; --time
-Dt = 1;
-SCALE = 1;
+Dt = 0.1;
 
 function GravityField(v)
     --takes a vector and returns the acceleration field. for now I will just
@@ -94,10 +94,11 @@ end
 
 --Start the simulation
 --
+SCALE = 3e-5;
 Limit = 3600 * 24 * 28
 DEBUG = false;
 DISPLAY = 0;
-UPDATES_PER_DISPLAY = 10;
+UPDATES_PER_DISPLAY = 100;
 
 -- while T < Limit do
 --     T = T + Dt;
@@ -113,7 +114,7 @@ UPDATES_PER_DISPLAY = 10;
 -- end
 
 function love.update()
-    for _ = 1, 10 do
+    for _ = 1, UPDATES_PER_DISPLAY do
         T = T + Dt;
         local gf = GravityField(X);
         -- Tprint(X)
@@ -123,14 +124,27 @@ function love.update()
             print(' ')
         end
         X = Vector_addition(X, Vector_scalar_multiplication(Dt, V))--X + V * Dt;
-        Xdisplay = Vector_scalar_multiplication(1e-5, X)
         V = Vector_addition(V, Vector_scalar_multiplication(Dt, gf))--V + gf * Dt;
     end
 end
+Blinker = 0
 
-function love.draw()
-    love.graphics.ellipse("line", 300, 300, 15)
-    -- love.timer.sleep(1)
-    love.graphics.ellipse("line",  SCALE * Xdisplay[2] + 300, SCALE * Xdisplay[3] + 300, 2)
-    love.graphics.print("T: ".. T, 10, 10)
+Trail_len = 100
+Trail = {}
+for i = 1, Trail_len do
+    Trail[i] = X
 end
+
+Counter = 0;
+function love.draw()
+    Counter = Counter + 1
+    love.graphics.ellipse("line", 300, 300, EARTH_DIAMETER * SCALE)
+    love.timer.sleep(0.02)
+    love.graphics.ellipse("line",  SCALE * X[2] * 0.7 + 300, SCALE * X[3] + 300, 2)
+    Trail[math.fmod(Counter, Trail_len) + 1] = X
+    for i= 1, Trail_len do
+        love.graphics.points(SCALE * Trail[i][2] * 0.7 + 300, SCALE * Trail[i][3] + 300)
+    end
+    love.graphics.print("T: ".. math.floor(T/3600) .. 'h', 10, 10)
+end
+
