@@ -58,7 +58,7 @@ end
 
 --Start the simulation
 --
-SCALE = 3e-5;
+SCALE = 2e-5--3e-5;
 Limit = 3600 * 24 * 28
 DEBUG = false;
 DISPLAY = 0;
@@ -80,7 +80,7 @@ function love.update()
 end
 Blinker = 0
 
-Trail_len = 200
+Trail_len = 1000
 Trail = {}
 for i = 1, Trail_len do
     Trail[i] = X
@@ -88,13 +88,16 @@ end
 
 Counter = 0;
 function love.draw()
+    angle = T/2000
+    Xd = Vecs.rotate3d(X, angle)
     Counter = Counter + 1
     love.graphics.ellipse("line", 300, 300, EARTH_DIAMETER * SCALE)
     love.timer.sleep(0.02)
-    love.graphics.ellipse("line",  SCALE * X[2] + 300, SCALE * X[3] + 300, 2)
+    love.graphics.ellipse("line",  SCALE * Xd[2] + 300, SCALE * Xd[3] + 300, 4)
     Trail[math.fmod(Counter, Trail_len) + 1] = X
     for i= 1, Trail_len do
-        love.graphics.points(SCALE * Trail[i][2] + 300, SCALE * Trail[i][3] + 300)
+        Traild = Vecs.rotate3d(Trail[i], angle)
+        love.graphics.points(SCALE * Traild[2] + 300, SCALE * Traild[3] + 300)
     end
     love.graphics.print("T: ".. math.floor(T/3600) .. 'h' .. math.floor(math.fmod(T, 3600)/60), 10, 10)
 end

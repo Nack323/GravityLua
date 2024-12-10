@@ -35,4 +35,16 @@ function Vectors.mul(scalar, v)
     return v3
 end
 
+function Vectors.rotate3d(v, angle)
+    -- This will do simply a matrix multiplication. The rotation will be about
+    -- the x axis bc I can
+    local s = math.sin(angle)
+    local c = math.cos(angle)
+    local vf = {}
+    vf[1] = c * v[1] + s * v[3]
+    vf[2] = v[2]
+    vf[3] = - s * v[1] + c * v[3]
+    return vf
+end
+
 return Vectors
