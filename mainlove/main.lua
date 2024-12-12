@@ -2,47 +2,20 @@
 -- function for this to work. 
 --
 love = require("love")
-
 Vecs = require("Vectors")
-
-function Table_printer(table)
-    --- prints a table in a non offensive manner.
-    -- print("[")
-    -- for _, el in ipairs(table) do
-    --     if _ ~= (#table) then
-    --         print(" " .. el .. ",")
-    --     else
-    --         print(" " .. el .. "")
-    --     end
-    -- end
-    -- print("]")
-    for _, el in ipairs(table) do
-        io.write(tostring(el) .. ' ')
-    end
-    io.write('\n')
-end
+Utils = require("Utils")
 
 
-
---- Now the simulation
-
--- the basic algo will be: 
--- velocity
--- position
--- grav field (a function r3 to r3)
--- position = pos + vel * dt
--- vel = vel + grav * dt
---
 X = {0, 0, 6378e3 + 408e3};
 Xdisplay = Vecs.mul(1e-11, X)
-V = {0, -7660, 0};
+V = {0, -8660, 0}; -- 7660 speed looks good
 -- position and mass of the mass point
 MASS_POINT = {0, 0, 0};
 MASS_POINT_MASS = 5.97e24;
 EARTH_DIAMETER = 6378e3;
 -- a constant to keep things accurate
 GRAV_CONSTANT = 6.67430e-11;
-Tprint = Table_printer
+Tprint = Utils.tprint
 T = 0; --time
 Dt = 0.1;
 
