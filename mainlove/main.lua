@@ -9,6 +9,7 @@ Utils = require("Utils")
 X = {0, 0, 6378e3 + 408e3};
 Xdisplay = Vecs.mul(1e-11, X)
 V = {0, -8660, 0}; -- 7660 speed looks good
+Vini = Vecs.norm(V)
 -- position and mass of the mass point
 MASS_POINT = {0, 0, 0};
 MASS_POINT_MASS = 5.97e24;
@@ -36,6 +37,8 @@ Limit = 3600 * 24 * 28
 DEBUG = false;
 DISPLAY = 0;
 UPDATES_PER_DISPLAY = 100;
+X_OFFSET = 400
+Y_OFFSET = 300
 
 function love.update()
     for _ = 1, UPDATES_PER_DISPLAY do
@@ -60,18 +63,19 @@ for i = 1, Trail_len do
 end
 
 Counter = 0;
+local font = love.graphics.newFont(16, "normal", 1)
 function love.draw()
-    angle = T/2000
+    local angle = T/2000
     Xd = Vecs.rotate3d(X, angle)
     Counter = Counter + 1
-    love.graphics.ellipse("line", 300, 300, EARTH_DIAMETER * SCALE)
+    love.graphics.ellipse("line", X_OFFSET, Y_OFFSET, EARTH_DIAMETER * SCALE)
     love.timer.sleep(0.02)
-    love.graphics.ellipse("line",  SCALE * Xd[2] + 300, SCALE * Xd[3] + 300, 4)
+    love.graphics.ellipse("line",  SCALE * Xd[2] + X_OFFSET, SCALE * Xd[3] + Y_OFFSET, 4)
     Trail[math.fmod(Counter, Trail_len) + 1] = X
     for i= 1, Trail_len do
         Traild = Vecs.rotate3d(Trail[i], angle)
-        love.graphics.points(SCALE * Traild[2] + 300, SCALE * Traild[3] + 300)
+        love.graphics.points(SCALE * Traild[2] + X_OFFSET, SCALE * Traild[3] + Y_OFFSET)
     end
-    love.graphics.print("T: ".. math.floor(T/3600) .. 'h' .. math.floor(math.fmod(T, 3600)/60), 10, 10)
+    love.graphics.print("T: ".. math.floor(T/3600) .. 'h' .. math.floor(math.fmod(T, 3600)/60) .. "\nInitial velocity: " .. tostring(Vini) .. "\nCurrent velocity: ".. math.floor(Vectors.norm(V)), font, 10, 10)
 end
 
